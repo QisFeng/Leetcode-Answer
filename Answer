@@ -36,3 +36,581 @@ class Solution {
         return dummy.next;
     }
 }
+
+3. Longest Substring Without Repeating Characters
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s.length()<2) return s.length();
+        int maxl=0;
+        int left=0,right=0;
+        int[] dp=new int[256];
+        while(right<s.length()){
+            char c=s.charAt(right);
+            dp[c]++;
+            while(dp[c]>1){
+                dp[s.charAt(left++)]--;
+            }
+            maxl=Math.max(maxl,right-left+1);
+            right++;
+        }
+    }
+}
+
+5. Longest Palindromic Substring
+class Solution {
+    public String longestPalindrome(String s) {
+        if(s.length()<2) return s;
+        int maxl=0;
+        int index=0;
+        for(int i=0;i<s.length();i++){
+            //odd
+            int[] pos=palHelp(s,i,i);
+            if(pos[1]-pos[0]>maxl){
+                index=pos[0];
+                maxl=pos[1]-pos[0];
+            }
+            //even
+            pos=palHelp(s,i,i+1);
+            if(pos[1]-pos[0]>maxl){
+                index=pos[0];
+                maxl=pos[1]-pos[0];
+            }
+        }
+        return s.substring(index,index+maxl);
+    }
+    
+    public int[] palHelp(String s, int i, int j){
+        while(i>=0&&j<s.length()&&s.charAt(i)==s.charAt(j)){
+            i--;
+            j++;
+        }
+        return new int[] {i+1,j};
+    }
+}
+
+6. ZigZag Conversion
+class Solution {
+    public String convert(String s, int numRows) {
+        if(numRows==1) return s;
+        List<StringBuilder> ans=new ArrayList<>();
+        boolean down=false;
+        int count=0;
+        for(int i=0;i<numRows;i++){
+            ans.add(new StringBuilder());
+        }
+        for(int i=0;i<s.length();i++){
+            ans.get(count).append(s.charAt(i));
+            if(count==0||count==numRows-1) down=!down;
+            if(down==true) count++;
+            else count--;
+        }
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<numRows;i++){
+            sb.append(ans.get(i));
+        }
+        return sb.toString();
+    }
+}
+
+7. Reverse Integer
+class Solution {
+    public int reverse(int x) {
+        int rev=0;
+        while(x!=0){
+            int temp=x%10;
+            if(rev*10+temp>Integer.MAX_VALUE||rev*10+temp<Integer.MIN_VALUE||rev>Integer.MAX_VALUE/10||rev<Integer.MIN_VALUE/10){
+            return 0;
+        }
+            rev=rev*10+temp;
+            x=x/10;
+        }
+        
+        return rev;
+    }
+}
+
+9. Palindrome Number
+class Solution {
+    public boolean isPalindrome(int x) {
+        if(x<0) return false;
+        
+        int rev=0;
+        int ori=x;
+        while(x>0){
+            int temp=x%10;
+            if(rev>Integer.MAX_VALUE/10||rev<Integer.MIN_VALUE/10||rev*10+temp>Integer.MAX_VALUE||rev*10+temp<Integer.MIN_VALUE){
+                return false;
+            }
+            rev=rev*10+temp;
+            x=x/10;
+        }
+    
+        return rev==ori;
+   }
+}
+
+11. Container With Most Water
+class Solution {
+    public int maxArea(int[] height){
+        int left=0;
+        int right=height.length-1;
+        int maxArea=0;
+        while(left<right){
+            int leh=height[left];
+            int rih=height[right];
+            int curArea=Math.min(leh,rih)*(right-left);
+            maxArea=Math.max(maxArea,curArea);
+            if(leh>rih){
+                while(left<right&&rih>=height[right])
+                    right--;
+            }else{
+                while(left<right&&leh>=height[left])
+                    left++;
+            }
+        }
+        return maxArea;
+    }
+}
+
+12. Integer to Roman
+class Solution {
+    public String intToRoman(int num) {
+        int[] nums={1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        String[] roman={"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+        StringBuilder ans=new StringBuilder();
+        for(int i=0;i<nums.length;i++){
+            if(num<0) break;
+            if(num<nums[i]) continue;
+            while(num>=nums[i]){
+                ans.append(roman[i]);
+                num-=nums[i];
+            }
+        }
+        return ans.toString();
+    }
+}
+
+13. Roman to Integer
+class Solution {
+    public int romanToInt(String s) {
+        if(s.length()==0) return 0;
+        int ans=0;
+        char prev=' ';
+        for(char c:s.toCharArray()){
+            ans+=convert(c,prev);
+            prev=c;
+        }
+        return ans;
+    }
+    
+    public int convert(char c, char prev){
+        switch(c){
+            case 'I': 
+                return 1;
+            case 'V':
+                return prev=='I'? 3:5;
+            case 'X':
+                return prev=='I'? 8:10;
+            case 'L':
+                return prev=='X'? 30:50;
+            case 'C':
+                return prev=='X'? 80:100;
+            case 'D':
+                return prev=='C'? 300:500;
+            case 'M':
+                return prev=='C'? 800:1000;
+        }
+        throw new IllegalArgumentException("No such roman char");
+    }
+}
+
+14. Longest Common Prefix
+class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        if(strs.length==0) return "";
+        int len=0;
+        for(int i=0;i<strs[0].length();i++){
+            for(int j=1;j<strs.length;j++){
+                if(strs[j].length()<=i||strs[j].charAt(i)!=strs[0].charAt(i))
+                    return strs[0].substring(0,i);
+            }
+            len++;
+        }
+        return strs[0].substring(0,len);
+    }
+}
+
+15. 3Sum
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> ans=new ArrayList<>();
+        if(nums.length<3) return ans;
+        
+        Arrays.sort(nums);
+        
+        for(int i=0;i<nums.length-2;i++){
+            if(nums[i]>0) break;
+            int left=i+1;
+            int right=nums.length-1;
+            while(left<right){
+                int sum=nums[i]+nums[left]+nums[right];
+                if(sum==0){
+                    List<Integer> list=Arrays.asList(nums[i],nums[left],nums[right]);
+                    if(!ans.contains(list)) ans.add(list);
+                    left++;
+                    right--;
+                }else if(sum<0){
+                    left++;
+                }else{
+                    right--;
+                }
+            }
+        }
+        
+        return ans;
+    }
+}
+
+16. 3Sum Closest
+class Solution {
+    public int threeSumClosest(int[] nums, int target) {
+        Arrays.sort(nums);
+        int ans=0;
+        int dif=Integer.MAX_VALUE;
+        for(int i=0;i<nums.length-2;i++){
+            int left=i+1;
+            int right=nums.length-1;
+            while(left<right){
+                int sum=nums[i]+nums[left]+nums[right];
+                if(sum==target){
+                    return sum;
+                }else if(sum<target){
+                    int tempDif=target-sum;
+                    if(tempDif<dif){
+                        dif=tempDif;
+                        ans=sum;
+                    }
+                    left++;
+                }else{
+                    int tempDif=sum-target;
+                    if(tempDif<dif){
+                        dif=tempDif;
+                        ans=sum;
+                    }
+                    right--;
+                }
+            }
+        }
+        return ans;
+    }
+}
+
+17. Letter Combinations of a Phone Number
+class Solution {
+    public List<String> letterCombinations(String digits) {
+        List<String> ans=new ArrayList<>();
+        if(digits.length()==0) return ans;
+        Map<Character,String> map=new HashMap<>();
+        map.put('2',"abc");
+        map.put('3',"def");
+        map.put('4',"ghi");
+        map.put('5',"jkl");
+        map.put('6',"mno");
+        map.put('7',"pqrs");
+        map.put('8',"tuv");
+        map.put('9',"wxyz");
+        
+        ans.add("");
+        for(char num:digits.toCharArray()){
+            char[] ca=map.get(num).toCharArray();
+            List<String> preset=new ArrayList<>();
+            for(String s: ans){
+                for(char c: ca){
+                    preset.add(s+c);
+                }
+            }
+            ans=preset;
+        }
+        return ans;
+    }
+}
+
+18. 4Sum
+class Solution {
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> ans=new ArrayList<>();
+        if(nums.length<4) return ans;
+        Arrays.sort(nums);
+        for(int i=0;i<nums.length-3;i++){
+            for(int j=i+1;j<nums.length-2;j++){
+                int left=j+1;
+                int right=nums.length-1;
+                while(left<right){
+                    int sum=nums[i]+nums[j]+nums[left]+nums[right];
+                    if(sum==target){
+                        List<Integer> list=Arrays.asList(nums[i],nums[j],nums[left],nums[right]);
+                        if(!ans.contains(list)) ans.add(list);
+                        left++;
+                        right--;
+                    }else if(sum<target){
+                        left++;
+                    }else{
+                        right--;
+                    }
+                }
+            }
+        }
+        
+        return ans;
+    }
+}
+
+20. Valid Parentheses
+class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack=new Stack<>();
+        Map<Character,Character> map = new HashMap<>();
+        map.put(')','(');
+        map.put(']','[');
+        map.put('}','{');
+        for(char c: s.toCharArray()){
+            //if it is close parenthese
+            if(map.containsKey(c)){
+                if(stack.isEmpty()) return false;
+                if(map.get(c)!=stack.peek()) return false;
+                
+                stack.pop();
+            }else{
+                //if it is open
+                stack.push(c);
+            }        
+        }
+            
+        return stack.isEmpty();
+    }
+}
+
+49. Group Anagrams
+RT:O(n*k logk),n is strs.length, k is the longest str length
+class Solution {  
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String,List<String>> map=new HashMap<>();
+        for(String str:strs){
+            char[] ca=str.toCharArray();
+            Arrays.sort(ca);
+            String k=String.valueOf(ca);
+            if(!map.containsKey(k)) map.put(k,new ArrayList<>());
+            map.get(k).add(str);
+        }
+        
+        return new ArrayList<>(map.values());
+    }
+}
+RT:O(n*k*26)->O(nk) 
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String,List<String>> map=new HashMap<>();
+        for(String str:strs){
+            int[] count=new int[26];
+            for(char c:str.toCharArray()) count[c-'a']++;
+            String k=Arrays.toString(count);
+            if(!map.containsKey(k)) map.put(k,new ArrayList<>());
+            map.get(k).add(str);
+        }
+        
+        return new ArrayList<>(map.values());
+    }
+}
+
+112. Path Sum
+class Solution {
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if(root==null) return false;
+        if(root.left==null&&root.right==null) return root.val==sum;
+        return hasPathSum(root.left,sum-root.val)||hasPathSum(root.right,sum-root.val);
+    }
+}
+
+113.
+class Solution {
+    List<List<Integer>> ans=new ArrayList<>();
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        if(root==null) return ans;
+        Stack<Integer> path=new Stack<>();
+        findPath(root,sum,path);
+        return ans;
+    }
+    
+    public void findPath(TreeNode root, int sum, Stack<Integer> path){
+        path.push(root.val);
+        if(root.left==null&&root.right==null){
+            if(root.val==sum){
+                ans.add(new ArrayList<>(path));
+            }
+        }
+        if(root.left!=null) findPath(root.left,sum-root.val,path);
+        if(root.right!=null) findPath(root.right,sum-root.val,path);
+        path.pop();
+    }
+}
+
+121. Best Time to Buy and Sell Stock
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length==0) return 0;
+        int buy=prices[0];
+        int profit=0;
+        for(int price:prices){
+            buy=Math.min(buy,price);
+            profit=Math.max(price-buy,profit);
+        }
+        return profit;
+    }
+}
+
+122. Best Time to Buy and Sell Stock II
+
+146. LRU Cache
+class LRUCache {
+    //fast lookup&fast removal at the tail and fast insertion at the head
+    //if single linked list, it would cost O(n) to find the node
+    int size,capacity;
+    Map<Integer,ListNode> map=new HashMap<>();
+    ListNode header,trailer;
+    private class ListNode{
+        ListNode prev,next;
+        int key,val;
+    }
+    //key: key, value:Node
+    public LRUCache(int capacity) {
+        this.capacity=capacity;
+        size=0;
+        header=new ListNode();
+        trailer=new ListNode();
+        header.next=trailer;
+        trailer.prev=header;
+    }
+    
+    public int get(int key) {
+        ListNode node=map.get(key);
+        if(node==null) return -1;
+        moveToHead(node);
+        return node.val;
+    }
+    
+    public void put(int key, int value) {
+        ListNode node=map.get(key);
+        if(node==null){
+            ListNode newNode=new ListNode();
+            newNode.key=key;
+            newNode.val=value;
+            map.put(key,newNode);
+            addHead(newNode);
+            size++;
+            if(size>capacity){
+                ListNode tail=trailer.prev;
+                remove(tail);
+                map.remove(tail.key);
+                size--;
+            }
+        }else{
+            node.val=value;
+            map.put(key,node);
+            moveToHead(node);
+        }
+    }
+    
+    private void moveToHead(ListNode node){
+        remove(node);
+        addHead(node);
+    }
+    private void addHead(ListNode node){
+        header.next.prev=node;
+        node.next=header.next;
+        header.next=node;
+        node.prev=header;
+    }
+    private void remove(ListNode node){
+        node.prev.next=node.next;
+        node.next.prev=node.prev;
+    }
+}
+
+206. Reverse Linked List
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head==null||head.next==null) return head;
+        ListNode prev=null;
+        ListNode memo=head.next;
+        while(memo!=null){
+            head.next=prev;
+            prev=head;
+            head=memo;
+            memo=memo.next;
+        }
+        head.next=prev;
+        return head;
+    }
+}
+
+234. Palindrome Linked List
+O(n) time and O(1) space
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        if(head==null||head.next==null) return true;
+        ListNode curr=head;
+        int count=0;//count is number of nodes
+        while(curr!=null){
+            count++;
+            curr=curr.next;
+        }
+        int mid=0;
+        if(count%2==0) mid=count/2;
+        else mid=count/2+1;
+        ListNode middle=head;
+        while(mid>0){
+            mid--;
+            middle=middle.next;
+        }
+        ListNode tail=reverse(middle);
+        while(tail!=null){
+            if(head.val!=tail.val) return false;
+            head=head.next;
+            tail=tail.next;
+        }
+        return true;
+    }
+    
+    public ListNode reverse(ListNode middle){
+        if(middle.next==null) return middle;
+        ListNode prev=null;
+        ListNode memo=middle.next;
+        while(memo!=null){
+            middle.next=prev;
+            prev=middle;
+            middle=memo;
+            memo=memo.next;
+        }
+        middle.next=prev;
+        return middle;
+    }
+}
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        if(head==null||head.next==null) return true;
+        
+        List<Integer> list=new ArrayList();
+        while(head!=null){
+            list.add(head.val);
+            head=head.next;
+        }
+        int i=0,j=list.size()-1;
+        while(i<j){
+            //use.equals instead of !=
+            if(!list.get(i).equals(list.get(j))) return false;
+            i++;
+            j--;
+        }
+        return true;
+    }
+}

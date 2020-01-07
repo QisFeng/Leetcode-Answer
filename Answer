@@ -390,6 +390,101 @@ class Solution {
     }
 }
 
+26. Remove Duplicates from Sorted Array
+class Solution {
+    public int removeDuplicates(int[] nums) {
+        if(nums.length==0) return 0;
+        int slow=0;
+        int fast=1;
+        while(fast<nums.length){
+            if(nums[slow]!=nums[fast]){
+                nums[++slow]=nums[fast];
+            }
+            fast++;
+        }
+        return slow+1;
+    }
+}
+27. Remove Element
+class Solution {
+    public int removeElement(int[] nums, int val) {
+        int slow=0;
+        for(int num:nums){
+            if(num!=val){
+                nums[slow++]=num;
+            }
+        }
+        return slow;
+    }
+}
+
+28. Implement strStr()
+class Solution {
+    public int strStr(String haystack, String needle) {
+        if(needle.length()==0) return 0;
+        for(int i=0;i<haystack.length()-needle.length()+1;i++){
+            if(haystack.charAt(i)==needle.charAt(0)){
+                int j=1;
+                while(j<needle.length()){
+                    if(haystack.charAt(i+j)!=needle.charAt(j)) break;
+                    j++;
+                }
+                if(j==needle.length()) return i;
+            }
+        }
+        return -1;
+    }
+}
+
+35. Search Insert Position
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        if(nums.length==0) return 0;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]>=target) return i; 
+        }
+        return nums.length;
+    }
+}
+38. Count and Say
+class Solution {
+    public String countAndSay(int n) {
+        StringBuilder curr=new StringBuilder("1");
+        StringBuilder prev;
+        for(int i=1;i<n;i++){
+            prev=curr;
+            curr=new StringBuilder();
+            int count=1;
+            char say=prev.charAt(0);
+            for(int j=1;j<prev.length();j++){
+                if(prev.charAt(j)==say) count++;
+                else{
+                    curr.append(count).append(say);
+                    say=prev.charAt(j);
+                    count=1;
+                }
+            }
+            curr.append(count).append(say);
+        }
+        return curr.toString();
+    }
+}
+48. Rotate Image
+class Solution {
+    public void rotate(int[][] matrix) {
+        int n=matrix.length;
+        for(int i=0;i<(n+1)/2;i++){
+            for(int j=0;j<n/2;j++){
+                int temp=matrix[n-j-1][i];
+                matrix[n-j-1][i]=matrix[n-i-1][n-j-1];
+                matrix[n-i-1][n-j-1]=matrix[j][n-i-1];
+                matrix[j][n-i-1]=matrix[i][j];
+                matrix[i][j]=temp;
+            }
+        }
+    }
+}
+
 49. Group Anagrams
 RT:O(n*k logk),n is strs.length, k is the longest str length
 class Solution {  
@@ -419,6 +514,238 @@ class Solution {
         }
         
         return new ArrayList<>(map.values());
+    }
+}
+
+53. Maximum Subarray
+class Solution {
+    public int maxSubArray(int[] nums) {
+        if(nums.length==0) return Integer.MIN_VALUE;
+        int curr_max=nums[0],ans=nums[0];
+        for(int i=1;i<nums.length;i++){
+            curr_max=Math.max(nums[i],curr_max+nums[i]);
+            ans=Math.max(curr_max,ans);
+        }
+        return ans;
+    }
+}
+58. Length of Last Word
+class Solution {
+    public int lengthOfLastWord(String s) {
+        s=s.trim();
+        int i=s.lastIndexOf(' ');
+        return s.length()-i-1;
+    }
+}
+
+62. Unique Paths
+class Solution {
+    public int uniquePaths(int m, int n) {
+        int[][] dp=new int[m][n];
+        for(int i=0;i<m;i++){
+            dp[i][0]=1;
+        }
+        for(int i=1;i<n;i++){
+            dp[0][i]=1;
+        }
+        for(int k=1;k<m;k++){
+            for(int j=1;j<n;j++){
+                dp[k][j]=dp[k-1][j]+dp[k][j-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+
+63. Unique Paths II
+class Solution {
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m=obstacleGrid.length;
+        int n=obstacleGrid[0].length;
+        int[][] dp=new int[m][n];
+        for(int i=0;i<m;i++){
+            if(obstacleGrid[i][0]==1){
+                while(i<m){
+                    dp[i++][0]=0;
+                }
+                break;
+            }
+            dp[i][0]=1;
+        }
+        for(int i=0;i<n;i++){
+            if(obstacleGrid[0][i]==1){
+                while(i<n){
+                    dp[0][i++]=0;
+                }
+                break;
+            }
+            dp[0][i]=1;
+        }
+        for(int k=1;k<m;k++){
+            for(int l=1;l<n;l++){
+                if(obstacleGrid[k][l]==1) dp[k][l]=0;
+                else dp[k][l]=dp[k-1][l]+dp[k][l-1];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+
+66. Plus One
+class Solution {
+    public int[] plusOne(int[] digits) {
+        int len=digits.length;
+        
+        for(int i=len-1;i>=0;i--){
+            if(digits[i]==9) digits[i]=0;
+            else{
+                digits[i]++;
+                return digits;
+            }
+        }
+        int[] ans=new int[len+1];
+        ans[0]=1;
+        return ans;
+    }
+}
+
+67. Add Binary
+class Solution {
+    public String addBinary(String a, String b) {
+        int carry=0;
+        int i=a.length()-1;
+        int j=b.length()-1;
+        StringBuilder ans=new StringBuilder();
+        while(i>=0||j>=0){
+            if(i>=0) carry+=a.charAt(i--)-'0';
+            if(j>=0) carry+=b.charAt(j--)-'0';
+            ans.append(carry%2);
+            carry=carry/2;
+        }
+        if(carry==1) ans.append(carry);
+        return ans.reverse().toString();
+    }
+}
+
+70. Climbing Stairs
+class Solution {
+    public int climbStairs(int n) {
+        if(n==1) return 1;
+        int[] memo=new int[n];
+        memo[0]=1;
+        memo[1]=2;
+        for(int i=2;i<n;i++){
+            memo[i]=memo[i-1]+memo[i-2];
+        }
+        return memo[n-1];
+    }
+}
+
+100. Same Tree
+class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if(p==null&&q==null) return true;
+        if(p==null||q==null) return false;
+        return p.val==q.val&&isSameTree(p.left,q.left)&&isSameTree(p.right,q.right);
+    }
+}
+
+101. Symmetric Tree
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if(root==null) return true;
+        if(root.left==null&&root.right==null) return true;
+        return check(root.left,root.right);
+    }
+    public boolean check(TreeNode leftSide, TreeNode rightSide){
+        if(leftSide==null&&rightSide==null) return true;
+        if(leftSide==null||rightSide==null) return false;
+        return leftSide.val==rightSide.val&&check(leftSide.left,rightSide.right)&&check(leftSide.right,rightSide.left);
+    }
+}
+
+102. Binary Tree Level Order Traversal
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> ans=new ArrayList<>();
+        if(root==null) return ans;
+        Queue<TreeNode> q=new LinkedList<>();
+        q.add(root);
+        while(!q.isEmpty()){
+            int size=q.size();
+            List<Integer> list=new ArrayList<>();
+            for(int i=0;i<size;i++){
+                TreeNode curr=q.poll();
+                if(curr.left!=null) q.add(curr.left);
+                if(curr.right!=null) q.add(curr.right);
+                list.add(curr.val);
+            }
+            ans.add(list);
+        }
+        return ans;
+    }
+}
+
+103. Binary Tree Zigzag Level Order Traversal
+BFS:
+class Solution {
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ans=new ArrayList<>();
+        if(root==null) return ans;
+        Boolean zigzag=false;
+        Queue<TreeNode> q=new LinkedList<>();
+        q.add(root);
+        while(!q.isEmpty()){
+            int size=q.size();
+            List<Integer> level=new ArrayList<>();
+            for(int i=0;i<size;i++){
+                TreeNode curr=q.poll();
+                if(!zigzag){
+                    level.add(curr.val); 
+                }else{
+                    level.add(0,curr.val);
+                }
+                if(curr.left!=null) q.add(curr.left);
+                if(curr.right!=null) q.add(curr.right);
+            }
+            ans.add(level);
+            zigzag=!zigzag;
+        }
+        return ans;
+    }
+}
+Recursive:
+class Solution {
+    List<List<Integer>> ans=new ArrayList<>();
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        
+        traversal(root,0);
+        return ans;
+    }
+    public void traversal(TreeNode root,int level){
+        if(root==null) return;
+        if(ans.size()<=level) ans.add(new ArrayList<Integer>());
+        if(level%2==0){
+            ans.get(level).add(root.val);
+        }else{
+            ans.get(level).add(0,root.val);
+        }
+        traversal(root.left,level+1);
+        traversal(root.right,level+1);
+    }
+}
+
+111. Minimum Depth of Binary Tree
+class Solution {
+    
+    public int minDepth(TreeNode root) {
+        if(root==null) return 0;
+        if(root.left==null&&root.right==null) return 1;
+        int left=minDepth(root.left)+1;
+        int right=minDepth(root.right)+1;
+        if(root.left==null) return right;
+        if(root.right==null) return left;
+        return Math.min(left,right);
     }
 }
 
@@ -469,6 +796,116 @@ class Solution {
 }
 
 122. Best Time to Buy and Sell Stock II
+class Solution {
+    public int maxProfit(int[] prices) {
+        int ans=0;
+        for(int i=1;i<prices.length;i++){
+            ans+=prices[i]-prices[i-1]>0? prices[i]-prices[i-1]:0;
+        }
+        return ans;
+    }
+}
+
+129. Sum Root to Leaf Numbers
+class Solution {
+    int sum=0;
+    public int sumNumbers(TreeNode root) {
+        if(root==null) return sum;
+        helper(root,root.val);
+        return sum;
+    }
+    
+    public void helper(TreeNode root, int value){
+        
+        if(root.left==null&&root.right==null){
+            sum+=value;
+            return;
+        }
+        
+        if(root.left!=null) {
+            int add=value*10+root.left.val;
+            helper(root.left,add);
+        }
+        if(root.right!=null){
+            int add=value*10+root.right.val;
+            helper(root.right,add);
+        }
+        
+    }
+}
+
+136. Single Number
+class Solution {
+    public int singleNumber(int[] nums) {
+        Set<Integer> set=new HashSet<>();
+        int sum=0;
+        for(int num:nums){
+            if(set.contains(num)){
+                sum-=num;
+            }else{
+                set.add(num);
+                sum+=num;
+            }
+        }
+        return sum;
+    }
+}
+//XOR: ^=, only keeps the difference
+class Solution {
+    public int singleNumber(int[] nums) {
+        for(int i=1;i<nums.length;i++){
+            nums[i] ^= nums[i-1];//XOR
+        }
+        return nums[nums.length-1];
+    }
+}
+
+138. Copy List with Random Pointer
+//Method 1: O(n) time and space, but only go over the linked list once
+class Solution {
+    Map<Node,Node> map=new HashMap<>();
+    public Node copyRandomList(Node head) {
+        if(head==null) return null;
+        
+        Node oldNode=head;
+        map.put(oldNode,new Node(oldNode.val,null,null));
+        while(oldNode!=null){
+            //next
+            map.get(oldNode).next=getPointer(oldNode.next);
+            map.get(oldNode).random=getPointer(oldNode.random);
+            oldNode=oldNode.next;
+        }
+        return map.get(head);
+    }
+    public Node getPointer(Node node){
+        //clone node not created yet
+        if(node==null) return null;
+        if(!map.containsKey(node))
+            map.put(node,new Node(node.val,null,null));
+        return map.get(node);
+    }
+}
+//Method 2:O(n) time and space, but go over the linked list twice
+class Solution {
+    public Node copyRandomList(Node head) {
+        if(head==null) return null;
+        Node curr=head;
+        Map<Node,Node> map=new HashMap<>();
+        //copy all node
+        while(curr!=null){
+            map.put(curr,new Node(curr.val,null,null));
+            curr=curr.next;
+        }
+        curr=head;
+        //connect pointer
+        while(curr!=null){
+            map.get(curr).next=map.get(curr.next);
+            map.get(curr).random=map.get(curr.random);
+            curr=curr.next;
+        }
+        return map.get(head);
+    }
+}
 
 146. LRU Cache
 class LRUCache {
@@ -536,6 +973,52 @@ class LRUCache {
     }
 }
 
+167. Two Sum II - Input array is sorted
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        int left=0;
+        int right=numbers.length-1;
+        while(left<right){
+            if(target<numbers[left]) break;
+            int sum=numbers[left]+numbers[right];
+            if(sum==target) return new int[] {left+1,right+1};
+            else if(sum<target) left++;
+            else right--;
+        }
+        return new int[] {-1,-1};
+    }
+}
+
+200. Number of Islands
+class Solution {
+    public int numIslands(char[][] grid) {
+        
+        int row=grid.length;
+        if(row==0) return 0;
+        int col=grid[0].length;
+        //if visited, mark as 1
+        int count=0;
+        for(int i=0;i<row;i++){
+            for(int j=0;j<col;j++){
+                if(grid[i][j]=='1'){
+                    dfs(grid,i,j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    public void dfs(char[][] grid,int r,int c){
+        if(r<0||c<0||r>=grid.length||c>=grid[0].length||grid[r][c]=='0') return;
+        grid[r][c]='0';
+        dfs(grid,r-1,c);
+        dfs(grid,r+1,c);
+        dfs(grid,r,c-1);
+        dfs(grid,r,c+1);
+        
+    }
+}
+
 206. Reverse Linked List
 class Solution {
     public ListNode reverseList(ListNode head) {
@@ -550,6 +1033,35 @@ class Solution {
         }
         head.next=prev;
         return head;
+    }
+}
+
+226. Invert Binary Tree
+Recursive solution:
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if(root==null) return null;
+        TreeNode temp=root.left;
+        root.left=invertTree(root.right);
+        root.right=invertTree(temp);
+        return root;
+    }   
+}
+iterative solution:
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if(root==null) return null;
+        Queue<TreeNode> q=new LinkedList<>();
+        q.add(root);
+        while(!q.isEmpty()){
+            TreeNode curr=q.poll();
+            TreeNode temp=curr.left;
+            curr.left=curr.right;
+            curr.right=temp;
+            if(curr.left!=null) q.add(curr.left);
+            if(curr.right!=null) q.add(curr.right);
+        }
+        return root;
     }
 }
 
@@ -612,5 +1124,79 @@ class Solution {
             j--;
         }
         return true;
+    }
+}
+
+242. Valid Anagram
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        int[] count=new int[26];
+        for(char cs:s.toCharArray()){
+            count[cs-'a']++;
+        }
+        for(char ct:t.toCharArray()){
+            count[ct-'a']--;
+        }
+        for(int i=0;i<26;i++){
+            if(count[i]!=0) return false;
+        }
+        return true;
+    }
+}
+
+252. Meeting Rooms
+class Solution {
+    public boolean canAttendMeetings(int[][] intervals) {
+        if(intervals.length==0) return true;
+        Arrays.sort(intervals,(n1,n2) -> (n1[0]-n2[0]));
+        for(int i=1;i<intervals.length;i++){
+            if(intervals[i][0]<intervals[i-1][1]) return false;
+        
+        }
+        return true;
+    }
+}
+253. Meeting Rooms II
+class Solution {
+    public int minMeetingRooms(int[][] intervals) {
+        if(intervals.length==0) return 0;
+        Arrays.sort(intervals,(n1,n2)->(n1[0]-n2[0]));
+        PriorityQueue<int[]> pq=new PriorityQueue<>((n1,n2)->n1[1]-n2[1]);
+        for(int[] interval:intervals){
+            if(pq.size()==0){
+                pq.add(interval);
+                continue;
+            }
+            int[] check=pq.peek();
+            if(check[1]<=interval[0]) pq.poll();
+            pq.add(interval);
+        }
+        return pq.size();
+    }
+}
+346. Moving Average from Data Stream
+class MovingAverage {
+    int size;
+    int curSize;
+    Queue<Integer> q=new LinkedList<>();
+    double sum=0;
+    /** Initialize your data structure here. */
+    public MovingAverage(int size) {
+        this.size=size;
+        curSize=0;
+    }
+    
+    public double next(int val) {
+        curSize++;
+        if(curSize<=size){
+            q.add(val);
+            sum+=val;
+        }else{
+            sum-=q.poll();
+            curSize--;
+            q.add(val);
+            sum+=val;
+        }
+        return sum/curSize;
     }
 }

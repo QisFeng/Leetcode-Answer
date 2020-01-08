@@ -1174,6 +1174,27 @@ class Solution {
         return pq.size();
     }
 }
+
+266. Palindrome Permutation
+class Solution {
+    public boolean canPermutePalindrome(String s) {
+        Map<Character,Integer> map=new HashMap<>();
+        for(char a:s.toCharArray()){
+            if(!map.containsKey(a)){
+                map.put(a,1);
+            }else{
+                map.put(a,map.get(a)+1);
+            }
+        }
+        List<Integer> list=new ArrayList(map.values());
+        int count=0;
+        for(int i=0;i<list.size();i++){
+            if(list.get(i)%2!=0) count++;
+        }
+        return count<2;
+    }
+}
+
 346. Moving Average from Data Stream
 class MovingAverage {
     int size;
@@ -1198,5 +1219,340 @@ class MovingAverage {
             sum+=val;
         }
         return sum/curSize;
+    }
+}
+
+373. Find K Pairs with Smallest Sums
+class Solution {
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        List<List<Integer>> ans=new ArrayList<>();
+        PriorityQueue<int[]> pq=new PriorityQueue<>((n1,n2)->((n1[0]+n1[1])-(n2[0]+n2[1])));
+        int len1=nums1.length;
+        int len2=nums2.length;
+        if(len1==0||len2==0||k==0) return ans;
+        for(int i=0;i<len1;i++){
+            for(int j=0;j<len2;j++){
+                pq.add(new int[]{nums1[i],nums2[j]});
+            }
+        }
+        k=Math.min(k,len1*len2);
+        while(k>0){
+            int[] temp=pq.poll();
+            List<Integer> list=Arrays.asList(temp[0],temp[1]);
+            ans.add(list);
+            k--;
+        }
+        return ans;
+    }
+}
+
+380. Insert Delete GetRandom O(1)
+class RandomizedSet {
+    Map<Integer,Integer> map;
+    List<Integer> list;
+    Random rand=new Random();
+    //map<val,pos>
+    public RandomizedSet() {
+        map=new HashMap<Integer,Integer>();
+        list=new ArrayList<Integer>();
+    }
+    public boolean insert(int val) {
+        if(map.containsKey(val)) return false;
+        list.add(val);
+        map.put(val,list.size()-1);
+        return true;
+    }
+    public boolean remove(int val) {
+        if(!map.containsKey(val)) return false;
+        int index=map.get(val);
+        int num=list.get(list.size()-1);
+        list.set(index,num);
+        list.remove(list.size()-1);
+        map.put(num,index);
+        map.remove(val);
+        return true;
+    }
+
+    public int getRandom() {
+        return list.get(rand.nextInt(list.size()));
+    }
+}
+
+402. Remove K Digits
+class Solution {
+    public String removeKdigits(String num, int k) {
+        int len=num.length();
+        int remain=len-k;//remain digits that we need finally
+        if(len==0||k>=len) return "0";
+        //store the digit that we need
+        Stack<Character> stack=new Stack<>();
+        char[] digit=num.toCharArray();
+        
+        stack.push(digit[0]);
+        
+        for(int i=1;i<len;i++){
+            //if we remove enough digits, we add all the rest into stack
+            if(k==0){
+                while(i<len){
+                    stack.push(digit[i++]);
+                }
+                break;
+            }
+            //if we still need to remove digits,
+            //when the curr digit is < previous, pop it out until curr>stack.peek(). 
+            //break it if stack is empty and push the curr into stack.
+            while(k>0&&digit[i]<stack.peek()){
+                stack.pop();
+                k--;
+                if(stack.size()==0) break;
+            }
+            stack.push(digit[i]);
+        }
+        StringBuilder sb=new StringBuilder();
+        //if we have more digits at the end, remove them
+        while(stack.size()>remain){
+            stack.pop();
+        }
+        Stack<Character> ans=new Stack<>();
+        //reverse the stack and make it appendable in right order
+        while(stack.size()>0){
+            ans.push(stack.pop());
+        }
+        //remove the front 0, ex:0200 --> 200, 01 --> 1.
+        //but 0 is still 0
+        while(ans.size()>1&&ans.peek()=='0') ans.pop();
+        
+        while(ans.size()>0){
+            sb.append(ans.pop());
+        }
+        return sb.toString();
+    }
+}
+
+463. Island Perimeter
+class Solution {
+    int curPer=0;
+    public int islandPerimeter(int[][] grid) {
+        if(grid==null||grid.length==0) return 0;
+        int row=grid.length,col=grid[0].length;
+        
+        for(int i=0;i<row;i++){
+            for(int j=0;j<col;j++){
+                if(grid[i][j]==1){
+                    check(grid,i,j);
+                }
+            }
+        }
+        return curPer;
+    }
+    
+    public void check(int[][] grid, int r, int c){
+        
+        if(r-1>=0){
+            if(grid[r-1][c]==0) curPer++;
+        }else curPer++;
+        if(r+1<grid.length){
+            if(grid[r+1][c]==0) curPer++;
+        }else curPer++;
+        if(c-1>=0){
+            if(grid[r][c-1]==0) curPer++;
+        }else curPer++;
+        if(c+1<grid[0].length){
+            if(grid[r][c+1]==0) curPer++;
+        }else curPer++;
+        
+    }
+}
+
+496. Next Greater Element I
+class Solution {
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        int[] ans=new int[nums1.length];
+        Map<Integer,Integer> map=new HashMap<>();
+        Stack<Integer> stack=new Stack<>();
+        if(nums2.length!=0) stack.push(nums2[0]);
+        
+        for(int i=1;i<nums2.length;i++){
+            while(!stack.isEmpty()&&stack.peek()<nums2[i]){
+                map.put(stack.pop(),nums2[i]);
+            }
+            stack.push(nums2[i]);
+        }
+        while(!stack.isEmpty()){
+            map.put(stack.pop(),-1);
+        }
+        int k=0;
+        for(int num:nums1){
+            ans[k++]=map.get(num);
+        }
+        return ans;
+    }
+}
+
+572. Subtree of Another Tree
+class Solution {
+    public boolean isSubtree(TreeNode s, TreeNode t) {
+        if(s==null) return false;
+        
+        return check(s,t)||isSubtree(s.left,t)||isSubtree(s.right,t);
+    }
+    public boolean check(TreeNode s, TreeNode t){
+        if(s==null&&t==null) return true;
+        if(s==null||t==null) return false;
+        return s.val==t.val&&check(s.left,t.left)&&check(s.right,t.right);
+    }
+}
+
+653. Two Sum IV - Input is a BST
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        if(root==null) return false;
+        List<Integer> list=new ArrayList<>();
+        inOrder(root,list);
+        int left=0,right=list.size()-1;
+        while(left<right){
+            int sum=list.get(left)+list.get(right);
+            if(sum<k) left++;
+            else if(sum>k) right--;
+            else return true;
+        }
+        return false;
+    }
+    public void inOrder(TreeNode root, List<Integer> list){
+        if(root==null) return;
+        inOrder(root.left,list);
+        list.add(root.val);
+        inOrder(root.right,list);
+    }
+}
+
+695. Max Area of Island
+class Solution {
+    int area;
+    public int maxAreaOfIsland(int[][] grid) {
+        int row=grid.length;
+        if(row==0) return 0;
+        int col=grid[0].length;
+        int maxArea=0;
+        for(int i=0;i<row;i++){
+            for(int j=0;j<col;j++){
+                if(grid[i][j]==1){
+                    area=0;
+                    dfs(grid,i,j);
+                    maxArea=Math.max(maxArea,area);
+                }
+            }
+        }
+        return maxArea;
+    }
+    public void dfs(int[][] grid,int r,int c){
+        if(r<0||c<0||r>=grid.length||c>=grid.length||grid[r][c]==0) return;
+        grid[r][c]=0;
+        area++;
+        dfs(grid,r-1,c);
+        dfs(grid,r+1,c);
+        dfs(grid,r,c-1);
+        dfs(grid,r,c+1);
+    }
+}
+
+733. Flood Fill
+class Solution {
+    public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
+        if(image[sr][sc]==newColor) return image;
+        dfs(image,sr,sc,image[sr][sc],newColor);
+        return image;
+    }
+    public void dfs(int[][] image, int sr, int sc, int oldColor,int newColor){
+        if(sr<0||sc<0||sr>=image.length||sc>=image[0].length||image[sr][sc]!=oldColor) return;
+        image[sr][sc]=newColor;
+        dfs(image,sr-1,sc,oldColor,newColor);
+        dfs(image,sr+1,sc,oldColor,newColor);
+        dfs(image,sr,sc-1,oldColor,newColor);
+        dfs(image,sr,sc+1,oldColor,newColor);
+    }
+}
+
+937. Reorder Data in Log Files
+class Solution {
+    public String[] reorderLogFiles(String[] logs) {
+        
+        List<String> diglist = new ArrayList<>();
+        List<String> letlist = new ArrayList<>();
+        for(String str:logs){
+            if(str.charAt(str.indexOf(" ")+1)-'a'>=0&&str.charAt(str.indexOf(" ")+1)-'a'<26) letlist.add(str);
+            else diglist.add(str);
+        }
+        
+        Collections.sort(letlist,(c1,c2) ->{
+            String[] s1=c1.split(" ");
+            String[] s2=c2.split(" ");
+            for(int i=1;i<Math.min(s1.length,s2.length);i++){
+                if(!s1[i].equals(s2[i])){
+                    return s1[i].compareTo(s2[i]);
+                }
+            }
+            return s1[0].compareTo(s2[0]);
+        });
+        for(int i=0;i<logs.length;i++){
+            if(i<letlist.size()) logs[i]=letlist.get(i);
+            else logs[i]=diglist.get(i-letlist.size());
+        }
+        return logs;
+        
+    }
+}
+
+994. Rotting Oranges
+class Solution {
+    public int orangesRotting(int[][] grid) {
+        //bfs, store the gird=2 into queue as root
+        int row=grid.length;
+        int col=grid[0].length;
+        Queue<int[]> q=new LinkedList<>();
+        int fresh=0;
+        for(int i=0;i<row;i++){
+            for(int j=0;j<col;j++){
+                if(grid[i][j]==2)
+                    q.add(new int[] {i,j});
+                else if(grid[i][j]==1) fresh++;
+            }
+        }
+        if(fresh==0) return 0;
+        //root level are in the q
+        int level=0;
+        while(!q.isEmpty()){
+            if(fresh==0) break;
+            int size=q.size();
+            level++;
+            for(int i=0;i<size;i++){
+                int[] rotten=q.poll();
+                int r=rotten[0];
+                int c=rotten[1];
+                if(r-1>=0&&grid[r-1][c]==1){
+                    fresh--;
+                    grid[r-1][c]=2;
+                    q.add(new int[]{r-1,c});
+                }
+                if(c-1>=0&&grid[r][c-1]==1){
+                    fresh--;
+                    grid[r][c-1]=2;
+                    q.add(new int[]{r,c-1});
+                }
+                if(r+1<grid.length&&grid[r+1][c]==1){
+                    fresh--;
+                    grid[r+1][c]=2;
+                    q.add(new int[]{r+1,c});
+                }
+                if(c+1<grid[0].length&&grid[r][c+1]==1){
+                    fresh--;
+                    grid[r][c+1]=2;
+                    q.add(new int[]{r,c+1});
+                }
+            }
+            
+        }
+        if(fresh!=0) return -1;
+        return level;
     }
 }
